@@ -1,8 +1,10 @@
 # pbxprojWriter.rb
 # A library for creating Xcode project.pbxproj files
-# Version 1.2
+# Version 1.2 December 2012 by Dan Wright (initial bsxtools release).
 # Copyright (c) Dan Wright 2011-2012, All rights reserved.
 # http://danwright.info
+# Licensed under the MIT license. Part of the bsxtools project.
+# git://github.com/danwr/bsxtools.git
 
 require 'FileUtils'
 require 'xcodeproject/uuid.rb'

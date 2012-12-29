@@ -4,7 +4,9 @@
 # High-level ("sane") interface for creating Xcode projects from Ruby.
 # v1.0 June 2011 by Dan Wright.
 # v1.1.1 April 2012 by Dan Wright.
-
+# v1.2 December 2012 by Dan Wright.
+# Licensed under the MIT license. Part of the bsxtools project.
+# git://github.com/danwr/bsxtools.git
 #
 # Usage:
 #
@@ -14,7 +16,7 @@
 # (4) Add files to groups and (optionally) to target(s)
 # (5) Write out the project
 #
-# Example:
+# Brief example:
 # 	xp = XcodeProject.new
 # 	xp.newProject({})
 # 	xp.newGroup("Classes", "sources")
@@ -56,12 +58,7 @@ class XcodeProject
     def register(name)
         $_registeredProjects[name.downcase] = self
     end
-    
-    # standardize: for unit testing PbxprojWriter, make our UUIDs a bit less UU
-    def standardize
-        @proj.standardize
-    end
-    
+        
     def addFileTypes(mappings = {})
         @proj.addFileTypes(mappings)
     end
