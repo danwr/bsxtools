@@ -5,6 +5,10 @@
 # v1.0 June 2011 by Dan Wright.
 # v1.1.1 April 2012 by Dan Wright.
 # v1.2 December 2012 by Dan Wright.
+#
+# "Xcode" is a registered trademark of Apple, Inc. The bsxtools project is not affiliated with,
+# endorsed, or supported by Apple, Inc, in any shape or form.
+#
 # Licensed under the MIT license. Part of the bsxtools project.
 # git://github.com/danwr/bsxtools.git
 #
