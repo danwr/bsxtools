@@ -1,0 +1,98 @@
+#!/usr/bin/ruby
+#
+# bsxgen
+#
+# Tool for generating Xcode project files using ruby.
+# v1.0 by Dan Wright http://danwright.info/
+# Parts of the bsxtools project. Licensed under the MIT license.
+# git://github.com/danwr/bsxtools.git
+#
+
+require 'Set'
+require 'FileUtils'
+
+$:.unshift(File.expand_path(File.join(__FILE__, '../../lib')))
+
+require 'XcodeProject.rb'
+
+PROJECTS_ROOT = File.expand_path(File.join(__FILE__, '../../..'))
+
+projects_list = Dir.entries(PROJECTS_ROOT).find_all {|f| !f.start_with?('.')} 
+
+# every project has a 'project.rb' file in its root
+projects_list = projects_list.find_all {|project|
+    project_rb = File.join(PROJECTS_ROOT, project, 'project.rb')
+    require project_rb if File.exist?(project_rb)
+    File.exist?(project_rb)
+}
+
+$stdout.puts("Available projects: #{projects_list.join(', ')}")
+
+
+actions = Set.new
+configs = []
+projects = Set.new
+originalArguments = ARGV
+
+ARGV.push('--help') unless ARGV.count > 0
+
+while ARGV.count > 0
+    nextArg = ARGV.shift
+    case nextArg
+    when 'nuke', 'generate', 'build', 'open'
+        actions.add(nextArg) unless actions.include?(nextArg)
+    when 'debug', 'release', 'dist', 'distribution'
+        configs.push(nextArg) unless configs.include?(nextArg)
+    when *projects_list
+        projects.add(nextArg)
+    when 'help', '-h', '-help', '--help'
+        # TODO: Help needs work
+        $stderr.puts <<EO_HELP
+        THERE IS NO HOPE FOR YOU HAHAHAHAHAHAHA.
+EO_HELP
+        exit
+    else
+        $stderr.puts "*** ERROR Unrecognized argument #{nextArg}"
+        exit
+    end
+end
+
+configs = ['debug'] unless configs.count > 0
+
+proj_objects = []
+
+projects_list.each { |project|
+    if projects.include?(project)
+        proj_objects.push(registeredProject(project))
+    end
+}
+
+$stderr.puts "*** WARNING: You did not specify any known projects." unless proj_objects.count > 0
+
+if actions.include?('nuke')
+    # TODO: Handle alternate DerivedData locations.
+    $stderr.puts "Nuking DerivedData..."
+    FileUtils.remove_dir("#{ENV['HOME']}/Library/Developer/Xcode/DerivedData", true)
+end
+
+# each project (or its superclass) must implement the following methods:
+#   nuke
+#   generate
+#   build(configuration)
+#   open
+proj_objects.each { |project|
+    if actions.include?('generate')
+        project.nuke
+        sleep 1 # give Xcode a chance to notice
+        project.generate
+        sleep 1 # give Xcode a chance to notice
+    elsif actions.include?('nuke')
+        project.nuke
+    end
+    if actions.include?('build')
+        configs.each {|configuration| project.build(configuration) }
+    end
+    project.open if actions.include?('open')
+}
+
+    
